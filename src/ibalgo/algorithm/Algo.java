@@ -8,6 +8,13 @@ package ibalgo.algorithm;
  * 
  * @author wayne
  */
-public interface Algo extends Runnable {
+public abstract class Algo implements Runnable {
     
+    
+    
+    @Override
+    public abstract void run();
+    
+    public abstract void setParameters(Parameters p);
+    public abstract Parameters getParameters();
 }
