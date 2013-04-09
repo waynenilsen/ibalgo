@@ -14,7 +14,9 @@ import com.ib.client.Order;
 import com.ib.client.OrderState;
 import com.ib.client.UnderComp;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -45,10 +47,25 @@ public class IBDataManager implements EWrapper, Runnable {
     @Override
     public void run() {
         //throw new UnsupportedOperationException("Not supported yet.");
-        //get all the key sets
+        //get the keys. 
+        TrackedTicker currentTrackedTicker;
+        for(String currentTicker : datamap.keySet()) {
+            currentTrackedTicker = datamap.get(currentTicker);
+            
+            //add real time data request
+            sock.reqRealTimeBars(currentTrackedTicker.getTickerId(), 
+                    currentTrackedTicker.getContract(), 5, 
+                    "TRADES", false);
+        }
+        
+        //the rest of the real time data that will be added to the tracked tickers
+        //will happen through calls from EWrapper to realtimeBar. 
+        
     }
     
-    
+    /**
+     * This will update the data in all the tickers that we listen for. 
+     */
     @Override
     public void realtimeBar(int reqId, long time, double open, double high, double low, double close, long volume, double wap, int count) {
         

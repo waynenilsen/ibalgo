@@ -4,18 +4,35 @@
  */
 package ibalgo.data;
 
+import com.ib.client.Contract;
 import java.util.LinkedList;
-import java.util.List;
+import samples.base.StkContract;
 
 /**
  *
  * @author wayne
  */
 public class TrackedTicker {
+    private static int currentTickerId = 0;
     private int numberOfSecondsBetweenDataPoints;
     private int numberOfSecondsToRemember;
     private LinkedList<Double> prices;
     private String ticker;
+    private int tickerId;
+    
+    
+    /**
+     * This is the full constructor. 
+     * @param numberOfSecondsBetweenDataPoints defaults to 5 seconds
+     * @param numberOfSecondsToRemember defaults to one hour = 60*60 seconds
+     * @param ticker 
+     */
+    public TrackedTicker(int numberOfSecondsBetweenDataPoints, int numberOfSecondsToRemember, String ticker) {
+        this.numberOfSecondsBetweenDataPoints = numberOfSecondsBetweenDataPoints;
+        this.numberOfSecondsToRemember = numberOfSecondsToRemember;
+        this.ticker = ticker;
+        this.tickerId = currentTickerId++;
+    }
     
     /**
      * defaults for other parameters, just supply the ticker and you're good to
@@ -24,6 +41,18 @@ public class TrackedTicker {
      */
     public TrackedTicker(String ticker) {
         this(5, 60*60, ticker); // gives 1 hour stored. 
+    }
+    
+    /**
+     * @return the contract associated with this ticker. Right now we are using
+     * the stock contract
+     */
+    public Contract getContract() {
+        return new StkContract(ticker);
+    }
+    
+    public int getTickerId() {
+        return tickerId;
     }
     
     /**
@@ -53,18 +82,6 @@ public class TrackedTicker {
 
     public String getTicker() {
         return ticker;
-    }
-
-    /**
-     * This is the full constructor. 
-     * @param numberOfSecondsBetweenDataPoints defaults to 5 seconds
-     * @param numberOfSecondsToRemember defaults to one hour = 60*60 seconds
-     * @param ticker 
-     */
-    public TrackedTicker(int numberOfSecondsBetweenDataPoints, int numberOfSecondsToRemember, String ticker) {
-        this.numberOfSecondsBetweenDataPoints = numberOfSecondsBetweenDataPoints;
-        this.numberOfSecondsToRemember = numberOfSecondsToRemember;
-        this.ticker = ticker;
     }
     
 }
