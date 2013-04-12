@@ -8,6 +8,6 @@ package ibalgo.algorithm;
  *
  * @author wayne
  */
-public class Hearding {
+public class Herding {
     
 }
