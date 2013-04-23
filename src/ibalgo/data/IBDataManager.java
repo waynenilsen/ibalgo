@@ -27,6 +27,15 @@ public class IBDataManager implements EWrapper, Runnable {
     private Map<String, TrackedTicker > datamap = new HashMap<>();
     private int numberOfSecondsBetweenDataPoints = 5;
     private int numberOfSecondsToRemember = 3600;
+
+    public IBDataManager() {
+        sock.eConnect("", 7496, 0); //I stole this code from them.
+        if(sock.isConnected()) {
+            System.out.println("Server Connected");
+        } else {
+            System.out.println("Server not connected... problem. ");
+        }
+    }
     
     /**
      * keeps track of a new stock that we are concerned with trading on. 
@@ -51,7 +60,6 @@ public class IBDataManager implements EWrapper, Runnable {
         TrackedTicker currentTrackedTicker;
         for(String currentTicker : datamap.keySet()) {
             currentTrackedTicker = datamap.get(currentTicker);
-            
             //add real time data request
             sock.reqRealTimeBars(currentTrackedTicker.getTickerId(), 
                     currentTrackedTicker.getContract(), 5, 
@@ -63,12 +71,31 @@ public class IBDataManager implements EWrapper, Runnable {
         
     }
     
+    public TrackedTicker getTrackedTicker(String ticker) {
+        return datamap.get(ticker);
+    }
+    
+    private TrackedTicker getTrackedTickerByID(int id) {
+        TrackedTicker currentTrackedTicker;
+        for(String currentTicker : datamap.keySet()) {
+            currentTrackedTicker = datamap.get(currentTicker);
+            if(currentTrackedTicker.getTickerId() == id) {
+                return currentTrackedTicker;
+            }
+        }
+        return null;
+    }
+    
     /**
      * This will update the data in all the tickers that we listen for. 
      */
     @Override
     public void realtimeBar(int reqId, long time, double open, double high, double low, double close, long volume, double wap, int count) {
+        TrackedTicker tick = getTrackedTickerByID(reqId);
         
+        if(tick==null) return;
+        
+        tick.addPrice(wap);
     }
     
     

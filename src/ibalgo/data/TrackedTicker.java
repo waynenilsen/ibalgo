@@ -5,6 +5,7 @@
 package ibalgo.data;
 
 import com.ib.client.Contract;
+import java.awt.List;
 import java.util.LinkedList;
 import samples.base.StkContract;
 
@@ -32,6 +33,7 @@ public class TrackedTicker {
         this.numberOfSecondsToRemember = numberOfSecondsToRemember;
         this.ticker = ticker;
         this.tickerId = currentTickerId++;
+        prices = new LinkedList<>();
     }
     
     /**
@@ -60,11 +62,14 @@ public class TrackedTicker {
      * @param price 
      */
     public void addPrice(double price) {
-        if(prices.size() < numberOfSecondsToRemember/numberOfSecondsBetweenDataPoints) {
-            prices.addLast(price); // last is the newest
-        } else {
-            prices.removeFirst();//dump the oldest one
-            prices.addLast(price);
+        //this code has to be thread safe. 
+        synchronized(prices) {
+            if(prices.size() < numberOfSecondsToRemember/numberOfSecondsBetweenDataPoints) {
+                prices.addLast(price); // last is the newest
+            } else {
+                prices.removeFirst();//dump the oldest one
+                prices.addLast(price);
+            }
         }
     }
 
@@ -82,6 +87,10 @@ public class TrackedTicker {
 
     public String getTicker() {
         return ticker;
+    }
+    
+    public double getLastPrice() {
+        return prices.getLast();
     }
     
 }
